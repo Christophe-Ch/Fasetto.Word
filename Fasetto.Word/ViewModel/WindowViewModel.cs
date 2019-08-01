@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using Fasetto.Word.DataModels;
+using System.Windows;
 using System.Windows.Input;
 
 namespace Fasetto.Word.ViewModel
@@ -25,14 +26,18 @@ namespace Fasetto.Word.ViewModel
         /// </summary>
         private int _windowRadius = 10;
 
+        private WindowDockPosition _windowDockPosition = WindowDockPosition.Undocked;
+
         #endregion
 
         #region Properties
 
+        public bool Borderless { get { return _window.WindowState == WindowState.Minimized || _windowDockPosition == WindowDockPosition.Undocked; } }
+
         /// <summary>
         /// Size of the resize border around the window
         /// </summary>
-        public int ResizeBorder { get; set; } = 6;
+        public int ResizeBorder { get { return Borderless ? 0 : 6; } }
 
         /// <summary>
         /// The size of the resize border around the window, taking into account the outer margin
@@ -76,8 +81,12 @@ namespace Fasetto.Word.ViewModel
 
         public double WindowMinimumWidth { get; set; } = 400;
         public double WindowMinimumHeight { get; set; } = 400;
-        public Thickness InnerContentPadding { get { return new Thickness(ResizeBorder); } }
+        public Thickness InnerContentPadding { get { return new Thickness(0); } }
 
+        /// <summary>
+        /// The current page of the application
+        /// </summary>
+        public ApplicationPage CurrentPage { get; set; } = ApplicationPage.Login;
         #endregion
 
         #region Commands
@@ -112,6 +121,7 @@ namespace Fasetto.Word.ViewModel
 
             _window.StateChanged += (sender, e) =>
             {
+                OnPropertyChanged(nameof(Borderless));
                 OnPropertyChanged(nameof(ResizeBorderThickness));
                 OnPropertyChanged(nameof(OuterMarginSize));
                 OnPropertyChanged(nameof(OuterMarginSizeThickness));
